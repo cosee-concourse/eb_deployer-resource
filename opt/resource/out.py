@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 import io
 import json
-import shutil
 import sys
 from os import path
 
