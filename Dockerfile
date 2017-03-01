@@ -5,7 +5,7 @@ FROM ruby:2.2-alpine
 ARG ebdeployerVersion=0.6.6
 
 RUN mkdir -p /aws && \
-    apk -Uuv add python3 git && \
+    apk -Uuv add python3 git curl && \
     rm /var/cache/apk/* && \
     gem install eb_deployer -v $ebdeployerVersion
 
