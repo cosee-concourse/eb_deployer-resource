@@ -58,7 +58,9 @@ class TestOut(unittest.TestCase):
 
         self.assertEqual(out.execute('/'), -1)
 
-    def test_deploy(self):
+    @patch("eb_deployer.common.validate_path")
+    def test_deploy(self, mock_validate_path):
+        mock_validate_path.return_value = True
         Eb_deployer.execute_command.return_value = 0
 
         testutil.put_stdin(
@@ -83,9 +85,11 @@ class TestOut(unittest.TestCase):
                                                         '-e', 'dev'],
                                                        r'/tmp/put/')
 
+    @patch("eb_deployer.common.validate_path")
     @patch("io.open")
-    def test_deploy_with_stage_file(self, mock_io_open):
+    def test_deploy_with_stage_file(self, mock_io_open, mock_validate_path):
         Eb_deployer.execute_command.return_value = 0
+        mock_validate_path.return_value = True
         mock_file = MagicMock()
         mock_io_open.return_value = mock_file
         mock_file.read.return_value = "dev"
