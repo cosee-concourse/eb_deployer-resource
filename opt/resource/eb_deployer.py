@@ -39,36 +39,12 @@ class Eb_deployer:
         environment['AWS_ACCESS_KEY_ID'] = self.model.get_access_key()
         environment['AWS_SECRET_ACCESS_KEY'] = self.model.get_secret()
 
-        def print_stderr(prog):
-            while True:
-                nextline = prog.stderr.readline()
-                if nextline == b'' and prog.poll() is not None:
-                    break
-                common.log_error(nextline.rstrip().decode('ascii'))
+        p = Popen(command, stdout=PIPE, stderr=PIPE, env=environment, cwd=directory or '/', universal_newlines=True)
 
-        def print_stdout(prog):
-            """
-            print stdout to stderr because only thing printed to stdout should be result json
-            """
-            while True:
-                nextline = prog.stdout.readline()
-                if nextline == b'' and prog.poll() is not None:
-                    break
-                common.log_info(nextline.rstrip().decode('ascii'))
+        out, err = p.communicate()
+        common.log_info(out)
+        common.log_error(err)
 
-        p = Popen(command, stdout=PIPE, stderr=PIPE, env=environment, cwd=directory or '/')
-
-        out_p = Process(target=print_stdout(p))
-        out_e = Process(target=print_stderr(p))
-
-        out_e.start()
-        out_p.start()
-
-        out_p.join()
-        out_e.join()
-
-        returncode = p.wait()
-
-        common.log_info("{} exited with {}".format(command[0:2], returncode))
+        common.log_info("{} exited with {}".format(command[0:2], p.returncode))
 
         return p.returncode

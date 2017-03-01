@@ -4,6 +4,8 @@
 
 
 Deploys applications to Elastic Beanstalk.
+For smoke tests curl can be used. For other tools you need to add the alpine package to 
+the Dockerfile of this resource.
 
 ## Source Configuration
 
