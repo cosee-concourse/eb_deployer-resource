@@ -19,6 +19,14 @@ class Eb_deployer:
         config_filepath = path.join(self.model.directory, self.model.get_config_file())
         artifact_filepath = path.join(self.model.directory, self.model.get_artifact_file())
 
+        if not common.validate_path(config_filepath):
+            common.log_error("Config file not found")
+            return -1
+
+        if not common.validate_path(artifact_filepath):
+            common.log_error("Artifact not found")
+            return -1
+
         deploy_command = ['eb_deploy', '-c', config_filepath, '-p', artifact_filepath, '-e', self.env]
 
         return self.execute_command(deploy_command, self.model.directory)
