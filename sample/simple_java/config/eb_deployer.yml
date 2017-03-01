@@ -1,11 +1,11 @@
 # Application name, can only contain any combination of uppercase letters, lowercase
 # letters, numbers, dashes (-)
-application: eb-deployer-simple-java
+application: eb-deployer-simple-java-pmaus
 
 # Common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
-  # solution_stack_name: 64bit Amazon Linux 2014.02 v1.0.1 running Tomcat 7 Java 7
+  solution_stack_name: 64bit Amazon Linux 2016.09 v2.5.2 running Tomcat 7 Java 7
 
   # Tier name for environments. Current supported values are WebServer and Worker
   # tier: WebServer
@@ -84,7 +84,7 @@ common:
     # go back to t1.micro.
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
-      value: t2.micro
+      value: t1.micro
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
