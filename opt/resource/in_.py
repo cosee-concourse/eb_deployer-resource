@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
-import os
 
-from concourse_common.jsonutil import *
 from concourse_common.common import *
+from concourse_common.jsonutil import *
 
 import schemas
 from model import *
@@ -14,9 +13,9 @@ def execute(directory):
         return -1
 
     with open(join_paths(directory, "env"), "w+") as file:
-        file.write(get_version(payload, VERSION_JSON_NAME))
+        file.write(get_version(payload, VERSION_KEY_NAME))
 
-    print(get_version_output(get_version(payload, VERSION_JSON_NAME), VERSION_JSON_NAME))
+    print(get_version_output(get_version(payload, VERSION_KEY_NAME), VERSION_KEY_NAME))
     return 0
 
 

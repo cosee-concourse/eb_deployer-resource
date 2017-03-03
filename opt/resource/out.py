@@ -45,7 +45,7 @@ def execute(directory):
         result = eb_deployer.remove_service()
 
     if result == 0:
-        print(get_version_output(env, VERSION_JSON_NAME))
+        print(get_version_output(env, VERSION_KEY_NAME))
 
     return result
 

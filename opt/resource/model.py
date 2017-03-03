@@ -1,4 +1,4 @@
-VERSION_JSON_NAME = 'env'
+VERSION_KEY_NAME = 'env'
 
 ACCESS_KEY = 'access_key_id'
 SECRET_KEY = 'secret_access_key'
