@@ -3,12 +3,12 @@ from unittest.mock import MagicMock, patch
 
 import out
 from concourse_common import testutil
-from eb_deployer import Eb_deployer
+from eb_deployer import EBDeployer
 
 
 class TestOut(unittest.TestCase):
     def setUp(self):
-        Eb_deployer.execute_command = MagicMock(name='execute_command')
+        EBDeployer.execute_command = MagicMock(name='execute_command')
 
     def test_invalid_json(self):
         testutil.put_stdin(
@@ -39,7 +39,7 @@ class TestOut(unittest.TestCase):
         self.assertEqual(out.execute('/'), -1)
 
     def test_deploy_artifact_file_needed(self):
-        Eb_deployer.execute_command.return_value = 0
+        EBDeployer.execute_command.return_value = 0
 
         testutil.put_stdin(
             """
@@ -58,10 +58,10 @@ class TestOut(unittest.TestCase):
 
         self.assertEqual(out.execute('/'), -1)
 
-    @patch("eb_deployer.common.validate_path")
+    @patch("eb_deployer.validate_path")
     def test_deploy(self, mock_validate_path):
         mock_validate_path.return_value = True
-        Eb_deployer.execute_command.return_value = 0
+        EBDeployer.execute_command.return_value = 0
 
         testutil.put_stdin(
             """
@@ -80,19 +80,18 @@ class TestOut(unittest.TestCase):
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        Eb_deployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-p', r'/tmp/put/artifact/package.zip',
                                                         '-e', 'dev'],
                                                        r'/tmp/put/')
 
-    @patch("eb_deployer.common.validate_path")
-    @patch("io.open")
-    def test_deploy_with_stage_file(self, mock_io_open, mock_validate_path):
-        Eb_deployer.execute_command.return_value = 0
+    @patch("eb_deployer.validate_path")
+    @patch("out.ioutil")
+    def test_deploy_with_stage_file(self, mock_ioutil, mock_validate_path):
+        EBDeployer.execute_command.return_value = 0
         mock_validate_path.return_value = True
-        mock_file = MagicMock()
-        mock_io_open.return_value = mock_file
-        mock_file.read.return_value = "dev"
+        mock_ioutil.read_file.return_value = "dev"
+
 
         testutil.put_stdin(
             """
@@ -111,13 +110,15 @@ class TestOut(unittest.TestCase):
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        Eb_deployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-p', r'/tmp/put/artifact/package.zip',
                                                         '-e', 'dev'],
                                                        r'/tmp/put/')
 
-    def test_remove(self):
-        Eb_deployer.execute_command.return_value = 0
+    @patch("eb_deployer.validate_path")
+    def test_remove(self, mock_validate_path):
+        EBDeployer.execute_command.return_value = 0
+        mock_validate_path.return_value = True
 
         testutil.put_stdin(
             """
@@ -135,17 +136,17 @@ class TestOut(unittest.TestCase):
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        Eb_deployer.execute_command.assert_called_with(['eb_deploy',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy',
                                                         '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-e', 'dev', '-d'],
                                                        r'/tmp/put/')
 
-    @patch("io.open")
-    def test_remove_with_stage_file(self, mock_io_open):
-        Eb_deployer.execute_command.return_value = 0
-        mock_file = MagicMock()
-        mock_io_open.return_value = mock_file
-        mock_file.read.return_value = "dev"
+    @patch("eb_deployer.validate_path")
+    @patch("out.ioutil")
+    def test_remove_with_stage_file(self, mock_ioutil, mock_validate_path):
+        EBDeployer.execute_command.return_value = 0
+        mock_ioutil.read_file.return_value = "dev"
+        mock_validate_path.return_value = True
 
         testutil.put_stdin(
             """
@@ -163,7 +164,7 @@ class TestOut(unittest.TestCase):
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        Eb_deployer.execute_command.assert_called_with(['eb_deploy',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy',
                                                         '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-e', 'dev', '-d'],
                                                        r'/tmp/put/')

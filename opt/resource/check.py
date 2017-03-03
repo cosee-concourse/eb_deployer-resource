@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
-from model import Model, Request
+from concourse_common.jsonutil import *
+import schemas
 
 
 def execute():
-    try:
-        Model(Request.CHECK)
-    except TypeError:
+    valid, payload = load_and_validate_payload(schemas, Request.CHECK)
+    if not valid:
         return -1
 
     print([{}])

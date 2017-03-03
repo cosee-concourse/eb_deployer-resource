@@ -1,4 +1,4 @@
-sourceSchema = {
+source_schema = {
     "type": "object",
     "properties": {
         "access_key_id": {
@@ -14,7 +14,7 @@ sourceSchema = {
     ]
 }
 
-versionSchema = {
+version_schema = {
     "oneOf": [{
         "type": "object",
         "properties": {
@@ -27,23 +27,23 @@ versionSchema = {
     }]
 }
 
-checkSchema = {
+check_schema = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
-        "source": sourceSchema,
-        "version": versionSchema
+        "source": source_schema,
+        "version": version_schema
     },
     "required": [
         "source"
     ]
 }
 
-outSchema = {
+out_schema = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
-        "source": sourceSchema,
+        "source": source_schema,
         "params": {
             "type": "object",
             "properties": {
@@ -93,12 +93,12 @@ outSchema = {
     ]
 }
 
-inSchema = {
+in_schema = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
-        "source": sourceSchema,
-        "version": versionSchema
+        "source": source_schema,
+        "version": version_schema
     },
     "required": [
         "source",

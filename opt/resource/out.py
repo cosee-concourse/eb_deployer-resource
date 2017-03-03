@@ -1,48 +1,56 @@
 #! /usr/bin/env python3
-import io
-import json
-import sys
-from os import path
 
-from concourse_common import common
-from model import Model, Request, VERSION_JSON_NAME
-from eb_deployer import Eb_deployer
+from concourse_common import ioutil
+from concourse_common.common import *
+from concourse_common.jsonutil import *
+
+import schemas
+from eb_deployer import EBDeployer
+from model import *
+
+
+def is_deploy_command(payload):
+    if contains_params_key(payload, DEPLOY_KEY):
+        return get_params_value(payload, DEPLOY_KEY)
+    return False
+
+
+def is_remove_command(payload):
+    if contains_params_key(payload, REMOVE_KEY):
+        return get_params_value(payload, REMOVE_KEY)
+    return False
 
 
 def execute(directory):
-    try:
-        model = Model(Request.OUT)
-    except TypeError:
+    valid, payload = load_and_validate_payload(schemas, Request.OUT)
+    if not valid:
         return -1
 
-    if model.env_file_exists():
-        env = io.open(path.join(directory, model.get_env_file()), "r").read()
-    elif model.env_name_exists():
-        env = model.get_env_name()
+    if contains_params_key(payload, ENV_FILE_KEY):
+        env = ioutil.read_file(join_paths(directory, get_params_value(payload, ENV_FILE_KEY)))
+    elif contains_params_key(payload, ENV_KEY):
+        env = get_params_value(payload, ENV_KEY)
     else:
-        common.log_error("Requires env or env_file.")
+        log_error("Requires env or env_file.")
         return -1
 
-    eb_deployer = Eb_deployer(model, env)
+    eb_deployer = EBDeployer(payload, directory, env)
 
     result = 0
 
-    model.directory = directory
-
-    if model.is_deploy_command():
+    if is_deploy_command(payload):
         result = eb_deployer.deploy_service()
 
-    if model.is_remove_command():
+    if is_remove_command(payload):
         result = eb_deployer.remove_service()
 
     if result == 0:
-        print(json.dumps({'version': {VERSION_JSON_NAME: env}}))
+        print(get_version_output(env, VERSION_JSON_NAME))
 
     return result
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        common.log_error("Wrong number of arguments!")
+    if not check_system_argument_number():
         exit(-1)
     exit(execute(sys.argv[1]))
