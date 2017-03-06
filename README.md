@@ -34,9 +34,10 @@ Uses eb_deployer configuration from `config_file` and `artifact_file` to deploy/
 
 #### Parameters
  
-* `config_file`: *Required* Folder path that contains eb_deployer.yml. 
+* `config_file`: *Required* Folder path that contains config/eb_deployer.yml. 
 
-* `artifact_file`: Path to artifact file (full path) used as package for deployment. 
+* `artifact_file`: Regular expression to artifact file path used as package for deployment. 
+ Example: `artifacts/release-(.*).zip`
  
 * `env_file`: Path to a file that contains the name of the environment to deploy/remove
 

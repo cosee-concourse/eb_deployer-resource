@@ -58,9 +58,11 @@ class TestOut(unittest.TestCase):
 
         self.assertEqual(out.execute('/'), -1)
 
+    @patch("eb_deployer.files")
     @patch("eb_deployer.validate_path")
-    def test_deploy(self, mock_validate_path):
+    def test_deploy(self, mock_validate_path, mock_files):
         mock_validate_path.return_value = True
+        mock_files.return_value = ['package-1.0.0.zip', 'foo.txt', 'bar.zip', 'package-1.0.0.jar']
         EBDeployer.execute_command.return_value = 0
 
         testutil.put_stdin(
@@ -73,24 +75,26 @@ class TestOut(unittest.TestCase):
               "params": {
                 "env": "dev",
                 "deploy": true,
-                "artifact_file": "artifact/package.zip",
+                "artifact_file": "artifact/package-(.*).zip",
                 "config_file": "source/ci/"
               }
             }
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        EBDeployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
-                                                        '-p', r'/tmp/put/artifact/package.zip',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy',
+                                                        '-p', r'/tmp/put/artifact/package-1.0.0.zip',
                                                         '-e', 'dev'],
-                                                       r'/tmp/put/')
+                                                       r'/tmp/put/source/ci/')
 
+    @patch("eb_deployer.files")
     @patch("eb_deployer.validate_path")
     @patch("out.ioutil")
-    def test_deploy_with_stage_file(self, mock_ioutil, mock_validate_path):
+    def test_deploy_with_stage_file(self, mock_ioutil, mock_validate_path, mock_files):
         EBDeployer.execute_command.return_value = 0
         mock_validate_path.return_value = True
         mock_ioutil.read_file.return_value = "dev"
+        mock_files.return_value = ['package-1.0.0.zip', 'foo.txt', 'bar.zip', 'package-1.0.0.jar']
 
 
         testutil.put_stdin(
@@ -103,17 +107,17 @@ class TestOut(unittest.TestCase):
               "params": {
                 "env_file": "naming/env",
                 "deploy": true,
-                "artifact_file": "artifact/package.zip",
+                "artifact_file": "artifact/package-(.*).zip",
                 "config_file": "source/ci/"
               }
             }
             """)
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
-        EBDeployer.execute_command.assert_called_with(['eb_deploy', '-c', r'/tmp/put/source/ci/eb_deployer.yml',
-                                                        '-p', r'/tmp/put/artifact/package.zip',
+        EBDeployer.execute_command.assert_called_with(['eb_deploy',
+                                                        '-p', r'/tmp/put/artifact/package-1.0.0.zip',
                                                         '-e', 'dev'],
-                                                       r'/tmp/put/')
+                                                       r'/tmp/put/source/ci/')
 
     @patch("eb_deployer.validate_path")
     def test_remove(self, mock_validate_path):
@@ -137,9 +141,8 @@ class TestOut(unittest.TestCase):
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
         EBDeployer.execute_command.assert_called_with(['eb_deploy',
-                                                        '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-e', 'dev', '-d'],
-                                                       r'/tmp/put/')
+                                                       r'/tmp/put/source/ci/')
 
     @patch("eb_deployer.validate_path")
     @patch("out.ioutil")
@@ -165,9 +168,8 @@ class TestOut(unittest.TestCase):
 
         self.assertEqual(out.execute(r'/tmp/put/'), 0)
         EBDeployer.execute_command.assert_called_with(['eb_deploy',
-                                                        '-c', r'/tmp/put/source/ci/eb_deployer.yml',
                                                         '-e', 'dev', '-d'],
-                                                       r'/tmp/put/')
+                                                       r'/tmp/put/source/ci/')
 
 
 if __name__ == '__main__':

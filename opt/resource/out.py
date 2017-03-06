@@ -25,7 +25,7 @@ def execute(directory):
     valid, payload = load_and_validate_payload(schemas, Request.OUT)
     if not valid:
         return -1
-
+    # change directory to config folder and make artifact path fixed
     if contains_params_key(payload, ENV_FILE_KEY):
         env = ioutil.read_file(join_paths(directory, get_params_value(payload, ENV_FILE_KEY)))
     elif contains_params_key(payload, ENV_KEY):
