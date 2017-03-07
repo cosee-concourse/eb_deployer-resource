@@ -23,7 +23,7 @@ class EBDeployer:
 
         config_filepath = path.join(self.directory, get_params_value(self.payload, CONFIG_FILE_KEY))
 
-        artifact_regex = get_params_value(self.payload, ARTIFACT_FILE_KEY)
+        artifact_regex = join_paths(self.directory, get_params_value(self.payload, ARTIFACT_FILE_KEY))
         artifact_filename = self.get_artifact_filename(artifact_regex)
 
         if artifact_filename is None:
@@ -80,7 +80,7 @@ class EBDeployer:
         artifact_file_regex = elements[len(elements) - 1]
 
         artifact_filename = None
-        for file in files(path.dirname(artifact_file_regex)):
+        for file in files(path.dirname(artifact_regex)):
             m = re.match(artifact_file_regex, file)
             if m is not None:
                 artifact_filename = m.group(0)
