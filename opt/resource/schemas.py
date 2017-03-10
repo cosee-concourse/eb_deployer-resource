@@ -56,7 +56,7 @@ out_schema = {
                 "deploy": {
                     "type": "boolean"
                 },
-                "delete": {
+                "remove": {
                     "type": "boolean"
                 },
                 "config_file": {
